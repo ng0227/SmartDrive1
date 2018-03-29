@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -27,6 +29,8 @@ import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +46,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -51,22 +58,34 @@ import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Speed.Accelerationlist;
 import com.techhive.smartdrive.Speed.Data;
 import com.techhive.smartdrive.Speed.GpsServices;
+import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NavActivity extends AppCompatActivity implements LocationListener, GpsStatus.Listener,
-        OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private OneMoreFabMenu oneMoreFabMenu;
     private NavigationView navigationView;
     private TextView mFullNameTextView, mEmailTextView;
     private CircleImageView mProfileImageView;
-    String longi,lati;
+    String longi, lati;
     private LocationManager mLocationManager;
     private static Data data;
     TextView Speedtextview;
@@ -82,6 +101,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
+
+    ArrayList<LatLng> markerPoints = new ArrayList<>();
+    static final int REQ_CODE = 123;
+    Intent directionIntent;
+
 
     // boolean flag to toggle periodic location updates
     private boolean mRequestingLocationUpdates = false;
@@ -104,11 +128,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         if (checkPlayServices()) {
             buildGoogleApiClient();
         }
-        supportMapFragment =(SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.googleMap);
+        supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.googleMap);
         supportMapFragment.getMapAsync(this);
-        Speedtextview=(TextView)findViewById(R.id.speedtextview);
+        Speedtextview = (TextView) findViewById(R.id.speedtextview);
         data = new Data(onGpsServiceUpdate);
-        a=new Accelerationlist(getApplicationContext());
+        a = new Accelerationlist(getApplicationContext());
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         onGpsServiceUpdate = new Data.onGpsServiceUpdate() {
             @Override
@@ -120,6 +144,234 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
     }
+
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_map, menu);
+        return true;
+    }
+*/
+
+/*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav:
+
+                directionIntent = new Intent(this, DirectionsActivity.class);
+                startActivityForResult(directionIntent, REQ_CODE);
+
+                return true;
+
+            default:
+
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+*/
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQ_CODE) {
+            if (resultCode == RESULT_OK) {
+                String fromAddress = data.getStringExtra("fromAddress");
+                String toAddress = data.getStringExtra("toAddress");
+                LatLng s = new LatLng(data.getDoubleExtra("fromLat", 0.0), data.getDoubleExtra("fromLong", 0.0));
+                LatLng d = new LatLng(data.getDoubleExtra("toLat", 0.0), data.getDoubleExtra("toLong", 0.0));
+                markerPoints.add(s);
+                markerPoints.add(d);
+                drawRoute();
+            }
+        }
+    }
+
+    private void drawRoute() {
+        if (markerPoints != null) {
+
+            //to clear markers on the map
+            googleMap.clear();
+
+            //Creating MarkerOptions
+            MarkerOptions options = new MarkerOptions();
+
+            // Setting the position of the marker
+            options.position(markerPoints.get(0));
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            // Add new marker to the Google Map Android API V2
+            googleMap.addMarker(options);
+
+
+            options.position(markerPoints.get(1));
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            // Add new marker to the Google Map Android API V2
+            googleMap.addMarker(options);
+
+            // Checks, whether start and end locations are captured
+            if (markerPoints.size() >= 2) {
+                LatLng origin = (LatLng) markerPoints.get(0);
+                LatLng dest = (LatLng) markerPoints.get(1);
+
+                // Getting URL to the Google Directions API
+                String url = getDirectionsUrl(origin, dest);
+
+                DownloadTask downloadTask = new DownloadTask();
+
+                // Start downloading json data from Google Directions API
+                downloadTask.execute(url);
+
+            }
+        }
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+            parserTask.execute(result);
+        }
+    }
+
+
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList();
+                lineOptions = new PolylineOptions();
+
+                List<HashMap<String, String>> path = result.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(12);
+                lineOptions.color(Color.RED);
+                lineOptions.geodesic(true);
+
+            }
+
+// Drawing polyline in the Google Map for the i-th route
+            googleMap.addPolyline(lineOptions);
+        }
+    }
+
+
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+        String mode = "mode=driving";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+
+        return url;
+    }
+
 
     @Override
     protected void onPause() {
@@ -147,25 +399,21 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
-        if(auth.getCurrentUser()!=null)
-        {
+        if (auth.getCurrentUser() != null) {
             sharedPrefManager = new SharedPrefManager(mContext);
             String mUsername = sharedPrefManager.getName();
             String mEmail = sharedPrefManager.getUserEmail();
             mFullNameTextView.setText(mUsername);
             mEmailTextView.setText(mEmail);
             String uri = new String();
-            uri =  sharedPrefManager.getPhoto();
-            if(uri!=null)
-            {
-                if(!uri.equals("null"))
-                {
+            uri = sharedPrefManager.getPhoto();
+            if (uri != null) {
+                if (!uri.equals("null")) {
                     Uri mPhotoUri = Uri.parse(uri);
                     Picasso.with(mContext).load(mPhotoUri).placeholder(android.R.drawable.sym_def_app_icon).error(android.R.drawable.sym_def_app_icon).into(mProfileImageView);
                 }
                 // showtoast("no photo");
-                else
-                {
+                else {
                     mProfileImageView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -175,10 +423,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                 }
             }
 
-        }
-        else
-        {
-            startActivity(new Intent(NavActivity.this,LoginActivity.class));
+        } else {
+            startActivity(new Intent(NavActivity.this, LoginActivity.class));
             finish();
         }
 
@@ -191,14 +437,14 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         super.onResume();
         checkPlayServices();
         firstfix = true;
-        if (!data.isRunning()){
+        if (!data.isRunning()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("data", "");
             data = gson.fromJson(json, Data.class);
         }
-        if (data == null){
+        if (data == null) {
             data = new Data(onGpsServiceUpdate);
-        }else{
+        } else {
             data.setOnGpsServiceUpdate(onGpsServiceUpdate);
         }
 
@@ -224,8 +470,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
-            longi=""+longitude;
-            lati=""+latitude;
+            longi = "" + longitude;
+            lati = "" + latitude;
             LatLng latLng = new LatLng(latitude, longitude);
             if (googleMap != null) {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -233,7 +479,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
             }
 
         }
-        }
+    }
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -260,36 +506,40 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         return true;
     }
 
-    private void initFabbutton()
-    {
-        oneMoreFabMenu=(OneMoreFabMenu)findViewById(R.id.fab);
+
+    private void initFabbutton() {
+        oneMoreFabMenu = (OneMoreFabMenu) findViewById(R.id.fab);
         oneMoreFabMenu.setOptionsClick(new OneMoreFabMenu.OptionsClick() {
             @Override
             public void onOptionClick(Integer integer) {
-                    switch (integer) {
-                        case R.id.option1:
-                            Starttoggle();
-                            break;
-                        case R.id.option2:
-                            Intent irp=new Intent(NavActivity.this, ReportProblemActivity.class);
-                            irp.putExtra("longitude",longi);
-                            irp.putExtra("latitude",lati);
-                            startActivity(irp);
-                            break;
-                        case R.id.option3:
-                            sharedPrefManager.saveLatitude(mContext,lati);
-                            sharedPrefManager.saveLongitude(mContext,longi);
-                            showtoast("Location saved");
-                            break;
-                        case R.id.option4:
-                            Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
-                            break;
-                    }
+                switch (integer) {
+                    case R.id.option1:
+                        Starttoggle();
+                        break;
+                    case R.id.option2:
+                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
+                        irp.putExtra("longitude", longi);
+                        irp.putExtra("latitude", lati);
+                        startActivity(irp);
+                        break;
+                    case R.id.option3:
+                        sharedPrefManager.saveLatitude(mContext, lati);
+                        sharedPrefManager.saveLongitude(mContext, longi);
+                        showtoast("Location saved");
+                        break;
+                    case R.id.option4:
+                        directionIntent = new Intent(NavActivity.this, DirectionsActivity.class);
+                        startActivityForResult(directionIntent, REQ_CODE);
+
+                        Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
+                        break;
+                }
             }
         });
 
     }
-    public void initNavigationDrawer(){
+
+    public void initNavigationDrawer() {
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -298,41 +548,41 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 
                 int id = item.getItemId();
 
-                switch (id){
+                switch (id) {
                     case R.id.Profile:
-                        Toast.makeText(mContext,"!111",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "!111", Toast.LENGTH_LONG).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.Contact:
-                        Toast.makeText(mContext,"!222",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "!222", Toast.LENGTH_LONG).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.Near_Hospital:
-                        Toast.makeText(mContext,"!333",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "!333", Toast.LENGTH_LONG).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.highway_details:
-                        Toast.makeText(mContext,"highway details",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "highway details", Toast.LENGTH_LONG).show();
                         break;
                     case R.id.report_problem:
-                        Intent irp=new Intent(NavActivity.this, ReportProblemActivity.class);
-                        irp.putExtra("longitude",longi);
-                        irp.putExtra("latitude",lati);
+                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
+                        irp.putExtra("longitude", longi);
+                        irp.putExtra("latitude", lati);
                         startActivity(irp);
                         //Toast.makeText(mContext,"!444",Toast.LENGTH_LONG).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.track_problem:
-                        Toast.makeText(mContext,"!555",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.drawer_item_settings:
-                        Toast.makeText(getApplicationContext(),"Setting",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Setting", Toast.LENGTH_SHORT).show();
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.logout:
                         navsignout();
-                        Toast.makeText(getApplicationContext(),"Logout",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
                         drawerLayout.closeDrawers();
                         break;
                 }
@@ -340,7 +590,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
             }
         });
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close){
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
@@ -355,19 +605,19 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         actionBarDrawerToggle.syncState();
     }
 
-    public void Starttoggle()
-    {
+    public void Starttoggle() {
         if (!data.isRunning()) {
             data.setRunning(true);
             data.setFirstTime(true);
             showtoast("SmartDrive Safety service is ON");
             startService(new Intent(getBaseContext(), GpsServices.class));
-        }else{
+        } else {
             data.setRunning(false);
             stopService(new Intent(getBaseContext(), GpsServices.class));
             showtoast("SmartDrive Safety service is OFF");
         }
     }
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -388,11 +638,10 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
             //getacceleration(location.getSpeed());
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
-            longi=""+longitude;
-            lati=""+latitude;
+            longi = "" + longitude;
+            lati = "" + latitude;
             LatLng latLng = new LatLng(latitude, longitude);
-            if(data.isRunning())
-            {
+            if (data.isRunning()) {
                 Speedtextview.setText(s);
                 if (googleMap != null) {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -402,7 +651,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 
         }
     }
-//
+
+    //
 //    public void getacceleration(double l)
 //    {
 //        double speeddiff=l-oldspeed;
@@ -426,14 +676,14 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 //
 //        }
 //    }
-    public void showMessageDialog(String amessage){
+    public void showMessageDialog(String amessage) {
         AlertDialog.Builder alertDialogBuilder =
                 new AlertDialog.Builder(this)
                         .setTitle("Auto Alert System")
                         .setMessage(amessage)
                         .setPositiveButton("ACCEPT", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(NavActivity.this,"Accident accepted",Toast.LENGTH_LONG).show();
+                                Toast.makeText(NavActivity.this, "Accident accepted", Toast.LENGTH_LONG).show();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -446,19 +696,19 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         AlertDialog alertDialog = alertDialogBuilder.show();
     }
 
-    public void showtoast(String s)
-    {
+    public void showtoast(String s) {
         LayoutInflater li = getLayoutInflater();
-        View layout = li.inflate(R.layout.custom_toast,(ViewGroup) findViewById(R.id.toast_root));
+        View layout = li.inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.toast_root));
         TextView text = (TextView) layout.findViewById(R.id.toast_error);
         text.setText(s);
         Toast toast = new Toast(getApplicationContext());// Get Toast Context
-        toast.setGravity(Gravity.BOTTOM| Gravity.FILL_HORIZONTAL, 0, 0);// Set
+        toast.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0);// Set
         toast.setDuration(Toast.LENGTH_SHORT);// Set Duration
         toast.setView(layout); // Set Custom View over toast
         toast.show();// Finally show toast
     }
-//    void trt()
+
+    //    void trt()
 // {
 //    double latitude = location.getLatitude();
 //    double longitude = location.getLongitude();
@@ -541,7 +791,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         }
 
     }
-    public void showGpsDisabledDialog(){
+
+    public void showGpsDisabledDialog() {
         AlertDialog.Builder alertDialogBuilder =
                 new AlertDialog.Builder(this)
                         .setTitle("GPS is Settings")
@@ -561,6 +812,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 // Show the AlertDialog.
         AlertDialog alertDialog = alertDialogBuilder.show();
     }
+
     public static Data getData() {
         return data;
     }
@@ -579,8 +831,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-    private void navsignout()
-    {
+
+    private void navsignout() {
         new SharedPrefManager(mContext).clear();
         auth.signOut();
         Intent intent = new Intent(NavActivity.this, FActivity.class);

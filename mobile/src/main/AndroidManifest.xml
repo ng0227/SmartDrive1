@@ -25,19 +25,19 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAxeNm_0OlB8kQZIuhCBmFQsTVawp8q5Vs" />
 
-        <activity android:name=".Activities.SplashScreenActivity">
+        <activity
+            android:name=".Activities.NavActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activities.SplashScreenActivity" />
         <activity android:name=".Activities.FActivity" />
         <activity
             android:name=".Activities.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activities.NavActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.SignUpActivity"
@@ -51,8 +51,10 @@
             android:name=".Activities.ForgetPasswordActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Speed.AlertActivity" />
-        <activity android:name=".Problems.ReportProblemActivity"
-            android:parentActivityName=".Activities.NavActivity"></activity>
+        <activity
+            android:name=".Problems.ReportProblemActivity"
+            android:parentActivityName=".Activities.NavActivity" />
+        <activity android:name=".Activities.DirectionsActivity" />
     </application>
 
 </manifest>
