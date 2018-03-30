@@ -15,6 +15,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Utilities.Utils;
 import com.techhive.smartdrive.model.LocationDirections;
@@ -23,8 +25,7 @@ import java.util.ArrayList;
 
 public class DirectionsActivity extends AppCompatActivity {
 
-    private AutoCompleteTextView from;
-    private AutoCompleteTextView to;
+
     private Button loadDirections;
 
     private static final int REQ_CODE_SOURCE = 511;
@@ -41,29 +42,59 @@ public class DirectionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directions);
 
-        from = (AutoCompleteTextView) findViewById(R.id.from);
-        to = (AutoCompleteTextView) findViewById(R.id.to);
-        loadDirections = (Button) findViewById(R.id.load_directions);
+        fromLoc=new LocationDirections();
+        toLoc=new LocationDirections();
 
-        from.setOnClickListener(new View.OnClickListener() {
+
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setCountry("IND")
+                .build();
+
+
+        PlaceAutocompleteFragment autocompleteFragmentFrom = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment_from);
+
+        autocompleteFragmentFrom.setFilter(typeFilter);
+
+        autocompleteFragmentFrom.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onClick(View v) {
-             //   Utils.hideSoftKeyboard(DirectionsActivity.this);
-                launchSearchIntent(511);
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName());
+                fromLoc.setLatLng(place.getLatLng());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
 
-        to.setOnClickListener(new View.OnClickListener() {
+        PlaceAutocompleteFragment autocompleteFragmentTo = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment_to);
+
+        autocompleteFragmentTo.setFilter(typeFilter);
+
+
+        autocompleteFragmentTo.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onClick(View v) {
-             //   Utils.hideSoftKeyboard(DirectionsActivity.this);
-                launchSearchIntent(512);
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName());
+                toLoc.setLatLng(place.getLatLng());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
-
 
         intent = new Intent(this, NavActivity.class);
 
+        loadDirections = (Button) findViewById(R.id.load_directions);
         loadDirections.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +151,7 @@ public class DirectionsActivity extends AppCompatActivity {
                 fromLoc.setName((String) place.getName());
                 fromLoc.setAddress((String) place.getAddress());
                 fromLoc.setLatLng(place.getLatLng());
-                from.setText(place.getAddress());
+            //    from.setText(place.getAddress());
             }
         } else if (requestCode == 512) {
             if (resultCode == RESULT_OK) {
@@ -131,7 +162,7 @@ public class DirectionsActivity extends AppCompatActivity {
                 toLoc.setName((String) place.getName());
                 toLoc.setAddress((String) place.getAddress());
                 toLoc.setLatLng(place.getLatLng());
-                to.setText(place.getAddress());
+        //        to.setText(place.getAddress());
             }
 
         } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
