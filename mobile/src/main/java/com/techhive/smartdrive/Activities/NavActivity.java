@@ -29,8 +29,6 @@ import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,12 +52,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.techhive.smartdrive.Problems.ReportProblemActivity;
+import com.techhive.smartdrive.Problems.TrackProblemActivity;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Speed.Accelerationlist;
 import com.techhive.smartdrive.Speed.Data;
 import com.techhive.smartdrive.Speed.GpsServices;
-import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Trackers.FileDownTryActivity;
+import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -580,7 +579,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                     case R.id.track_problem:
                       //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
 
-                        Intent trackProblemIntent=new Intent(NavActivity.this,TrackProblemActivity.class);
+                        Intent trackProblemIntent=new Intent(NavActivity.this, TrackProblemActivity.class);
                         startActivity(trackProblemIntent);
                         drawerLayout.closeDrawers();
                         break;

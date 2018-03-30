@@ -63,7 +63,6 @@
             android:parentActivityName=".Activities.NavActivity" />
    
       <activity android:name=".Activities.DirectionsActivity" />
-        <activity android:name=".Activities.TrackProblemActivity"></activity>
         <activity android:name=".Trackers.FileDownTryActivity" />
         <activity android:name=".Activities.ProfileActivity" />
         <activity android:name=".Problems.TrackProblemActivity"></activity>

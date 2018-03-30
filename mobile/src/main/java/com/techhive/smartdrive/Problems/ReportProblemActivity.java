@@ -207,11 +207,11 @@ public class ReportProblemActivity extends AppCompatActivity {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle("Select Problem Category");
         String[] pictureDialogItems = {
-                "1",
-                "2",
-                "3",
-                "4",
-                "5"};
+                "1. Potholes",
+                "2. Accidents",
+                "3. Road terrain",
+                "4. Markings/Sign boards",
+                "5. Helpline"};
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener(){
                     @Override
@@ -281,6 +281,7 @@ public class ReportProblemActivity extends AppCompatActivity {
 
     public class ProblemUpload
     {
+
         String longitude,latitude,highway_Name,problem_Level,problem_Category,description,email;
         Uri image_url;
         public String Storage_Path = "Problem_Image_Uploads/";
@@ -292,6 +293,7 @@ public class ReportProblemActivity extends AppCompatActivity {
         public ProblemUpload(){}
         public ProblemUpload(Activity c, String email, String d1, String d2, String highway_Name, String problem_Level, String problem_Category, String description, Uri s)
         {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             storageReference = FirebaseStorage.getInstance().getReference();
             databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
             this.email=email;
