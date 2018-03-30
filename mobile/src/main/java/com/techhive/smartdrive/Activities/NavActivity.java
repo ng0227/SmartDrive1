@@ -533,6 +533,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 
                         Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
                         break;
+
+
                 }
             }
         });
@@ -573,7 +575,10 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.track_problem:
-                        Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
+                      //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
+
+                        Intent trackProblemIntent=new Intent(NavActivity.this,TrackProblemActivity.class);
+                        startActivity(trackProblemIntent);
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.drawer_item_settings:

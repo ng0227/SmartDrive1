@@ -5,9 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.techhive.smartdrive.R;
+import com.techhive.smartdrive.model.ProblemReportInfo;
 
 import java.util.ArrayList;
 
@@ -16,19 +18,17 @@ import java.util.ArrayList;
  */
 
 
-
-
 public class TrackProblemAdapter extends RecyclerView.Adapter<TrackProblemAdapter.TrackProblemViewHolder> {
 
     Context context;
-    ArrayList<String> problems;
+    ArrayList<ProblemReportInfo> problems;
 
-    public TrackProblemAdapter(Context context, ArrayList<String> problems) {
+    public TrackProblemAdapter(Context context, ArrayList<ProblemReportInfo> problems) {
         this.context = context;
         this.problems = problems;
     }
 
-    public void setProblems(ArrayList<String> problems){
+    public void setProblems(ArrayList<ProblemReportInfo> problems){
         this.problems.clear();
         this.problems.addAll(problems);
         notifyDataSetChanged();
@@ -43,13 +43,20 @@ public class TrackProblemAdapter extends RecyclerView.Adapter<TrackProblemAdapte
 
     @Override
     public void onBindViewHolder(TrackProblemAdapter.TrackProblemViewHolder holder, int position) {
-      //  StudentBatch batch=studentBatches.get(position);
-     /*   if(position==getItemCount()-1){
-            holder.viewLine.setVisibility(View.GONE);
+        ProblemReportInfo info=problems.get(position);
+
+        holder.description.setText(info.getDescription());
+
+        if(info.getDate()!=null){
+            holder.dateTv.setText(info.getDate());
         }
-        holder.batchName.setText(batch.getBatchName());
-        holder.courseName.setText(batch.getCourseName());
-        holder.subjectName.setText(batch.getSubjectName());*/
+        if (info.getStatus() == -1) {
+            holder.problemStatus.setText("Resolve");
+            holder.status.setBackgroundResource(R.drawable.online_circle_view);
+        } else if(info.getStatus()==0){
+            holder.problemStatus.setText("Pending");
+            holder.status.setBackgroundResource(R.drawable.offline_circle_view);
+        }
     }
 
     @Override
@@ -59,11 +66,20 @@ public class TrackProblemAdapter extends RecyclerView.Adapter<TrackProblemAdapte
 
     public class TrackProblemViewHolder extends RecyclerView.ViewHolder {
 
-        //fvb
+        TextView description;
+        ImageView date;
+        View status;
+        TextView problemStatus;
+        TextView dateTv;
 
         public TrackProblemViewHolder(View itemView) {
             super(itemView);
-         //   ButterKnife.bind(this, itemView);
+
+            description=itemView.findViewById(R.id.description);
+            date=itemView.findViewById(R.id.iv_schedule);
+            status=itemView.findViewById(R.id.v_problem_status);
+            problemStatus=itemView.findViewById(R.id.tv_test_status);
+            dateTv=itemView.findViewById(R.id.tv_time);
         }
     }
 }
