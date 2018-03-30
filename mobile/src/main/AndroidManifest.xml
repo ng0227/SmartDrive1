@@ -55,7 +55,8 @@
             android:name=".Problems.ReportProblemActivity"
             android:parentActivityName=".Activities.NavActivity" />
         <activity android:name=".Trackers.FileDownTryActivity" />
-        <activity android:name=".Activities.ProfileActivity"></activity>
+        <activity android:name=".Activities.ProfileActivity" />
+        <activity android:name=".Problems.TrackProblemActivity"></activity>
     </application>
 
 </manifest>

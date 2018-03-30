@@ -37,6 +37,8 @@ import com.google.firebase.storage.UploadTask;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
+import java.util.Date;
+
 public class ReportProblemActivity extends AppCompatActivity {
 
     TextView tvemail,tvpcat,tvplevel;
@@ -349,7 +351,7 @@ public class ReportProblemActivity extends AppCompatActivity {
         {
             @SuppressWarnings("VisibleForTests")
             String UploadId = databaseReference.push().getKey();
-            ProblemInfo UploadInfo = new ProblemInfo(UploadId,email,longitude,latitude,highway_Name,problem_Level,problem_Category,description,imageurl1);
+            ProblemInfo UploadInfo = new ProblemInfo(new Date().toLocaleString(),UploadId,email,longitude,latitude,highway_Name,problem_Level,problem_Category,description,imageurl1);
             databaseReference.child(UploadId).setValue(UploadInfo);
             progressDialog.dismiss();
 //            Intent i=new Intent(ReportProblemActivity.this,ReportProblemActivity.class);

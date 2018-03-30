@@ -28,6 +28,8 @@ import com.techhive.smartdrive.Problems.ProblemInfo;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
+import java.util.Date;
+
 public class GpsServices extends Service implements LocationListener, GpsStatus.Listener {
     private LocationManager mLocationManager;
 
@@ -283,7 +285,7 @@ public class GpsServices extends Service implements LocationListener, GpsStatus.
         private void reportproblem()
         {
             String UploadId = databaseReference1.push().getKey();
-            ProblemInfo UploadInfo = new ProblemInfo(UploadId,email,String.valueOf(longi),String.valueOf(lati),"0","3","6","Auto accident","");
+            ProblemInfo UploadInfo = new ProblemInfo(new Date().toLocaleString(),UploadId,email,String.valueOf(longi),String.valueOf(lati),"0","3","6","Auto accident","");
             databaseReference1.child(UploadId).setValue(UploadInfo);
         }
 
