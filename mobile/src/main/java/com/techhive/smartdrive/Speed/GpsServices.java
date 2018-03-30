@@ -214,7 +214,6 @@ public class GpsServices extends Service implements LocationListener, GpsStatus.
        
     @Override
     public IBinder onBind(Intent intent) {
-        // We don't provide binding, so return null
         return null;
     }
    
@@ -283,8 +282,8 @@ public class GpsServices extends Service implements LocationListener, GpsStatus.
         }
         private void reportproblem()
         {
-            ProblemInfo UploadInfo = new ProblemInfo(email,String.valueOf(longi),String.valueOf(lati),"0","3","6","Auto accident","");
             String UploadId = databaseReference1.push().getKey();
+            ProblemInfo UploadInfo = new ProblemInfo(UploadId,email,String.valueOf(longi),String.valueOf(lati),"0","3","6","Auto accident","");
             databaseReference1.child(UploadId).setValue(UploadInfo);
         }
 

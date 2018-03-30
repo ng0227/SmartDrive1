@@ -51,8 +51,11 @@
             android:name=".Activities.ForgetPasswordActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Speed.AlertActivity" />
-        <activity android:name=".Problems.ReportProblemActivity"
-            android:parentActivityName=".Activities.NavActivity"></activity>
+        <activity
+            android:name=".Problems.ReportProblemActivity"
+            android:parentActivityName=".Activities.NavActivity" />
+        <activity android:name=".Trackers.FileDownTryActivity" />
+        <activity android:name=".Activities.ProfileActivity"></activity>
     </application>
 
 </manifest>
