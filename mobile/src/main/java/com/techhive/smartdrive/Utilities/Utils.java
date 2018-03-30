@@ -3,9 +3,11 @@ package com.techhive.smartdrive.Utilities;
 /**
  * Created by Sunain Mittal on 1/1/2018.
  */
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.view.inputmethod.InputMethodManager;
 
 public class Utils {
 
@@ -28,4 +30,13 @@ public class Utils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 
     }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
 }
