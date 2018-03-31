@@ -29,8 +29,6 @@ import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,13 +51,15 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+import com.techhive.smartdrive.Accidents.SMSAlertActivity;
 import com.techhive.smartdrive.Problems.ReportProblemActivity;
+import com.techhive.smartdrive.Problems.TrackProblemActivity;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Speed.Accelerationlist;
 import com.techhive.smartdrive.Speed.Data;
 import com.techhive.smartdrive.Speed.GpsServices;
-import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Trackers.FileDownTryActivity;
+import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -518,10 +518,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         Starttoggle();
                         break;
                     case R.id.option2:
-                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
-                        irp.putExtra("longitude", longi);
-                        irp.putExtra("latitude", lati);
-                        startActivity(irp);
+
+//                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
+//                        irp.putExtra("longitude", longi);
+//                        irp.putExtra("latitude", lati);
+//                        startActivity(irp);
                         break;
                     case R.id.option3:
                         sharedPrefManager.saveLatitude(mContext, lati);
@@ -531,10 +532,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                     case R.id.option4:
                         directionIntent = new Intent(NavActivity.this, DirectionsActivity.class);
                         startActivityForResult(directionIntent, REQ_CODE);
-
                         Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
                         break;
-
+                    case R.id.option5:
+                        startActivity(new Intent(NavActivity.this, SMSAlertActivity.class));
+                        break;
 
                 }
             }
@@ -542,6 +544,10 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 
     }
 
+    public void setnavlocation()
+    {
+        
+    }
     public void initNavigationDrawer() {
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -580,7 +586,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                     case R.id.track_problem:
                       //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
 
-                        Intent trackProblemIntent=new Intent(NavActivity.this,TrackProblemActivity.class);
+                        Intent trackProblemIntent=new Intent(NavActivity.this, TrackProblemActivity.class);
                         startActivity(trackProblemIntent);
                         drawerLayout.closeDrawers();
                         break;

@@ -29,5 +29,9 @@
         android:id="@+id/option4"
         android:icon="@drawable/ic_alarm_white_24px"
         android:title="Navigation" />
+    <item
+        android:id="@+id/option5"
+        android:icon="@drawable/ic_alarm_white_24px"
+        android:title="SOS Alert" />
 
 </menu>
