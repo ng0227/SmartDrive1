@@ -32,6 +32,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAc_pLhVLrFkjDEZXkLjy4p9xJwKSdhMLc" />
 
+<!--
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBHy-bVSFWltdOOGgD1usXNBXNXm6Y544s" />
+-->
+
         <activity
             android:name=".Activities.NavActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -62,7 +68,13 @@
             android:name=".Problems.ReportProblemActivity"
             android:parentActivityName=".Activities.NavActivity" />
         <activity android:name=".Activities.DirectionsActivity" />
-        <activity android:name=".Activities.TrackProblemActivity"></activity>
+        <activity android:name=".Activities.TrackProblemActivity" />
+
+
+        <activity android:name=".Activities.NearbyAuthoritiesActivity">
+
+        </activity>
+
     </application>
 
 </manifest>

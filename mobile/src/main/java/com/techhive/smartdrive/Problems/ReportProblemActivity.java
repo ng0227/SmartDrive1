@@ -40,6 +40,8 @@ import com.techhive.smartdrive.Utilities.SharedPrefManager;
 public class ReportProblemActivity extends AppCompatActivity {
 
     TextView tvemail,tvpcat,tvplevel;
+    //EditText tvemail,tvpcat,tvplevel;
+
     EditText ethnumber,etlong,etlat,etdescription;
     RadioButton rbauto,rbset;
     Button btimage,btsubmit,btlastloc;
@@ -53,7 +55,8 @@ public class ReportProblemActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report_problem);
+     //   setContentView(R.layout.activity_report_problem);
+        setContentView(R.layout.report_layout);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Firebase.getDefaultConfig().setPersistenceEnabled(true);
@@ -66,9 +69,11 @@ public class ReportProblemActivity extends AppCompatActivity {
     }
     private void initviews()
     {
-        tvemail=(TextView)findViewById(R.id.report_problem_email_textview);
-        tvpcat=(TextView)findViewById(R.id.report_problem_problem_category);
-        tvplevel=(TextView)findViewById(R.id.report_problem_problem_level);
+
+        tvemail=findViewById(R.id.report_problem_email_textview);
+        tvpcat=findViewById(R.id.report_problem_problem_category);
+        tvplevel=findViewById(R.id.report_problem_problem_level);
+
         ethnumber=(EditText)findViewById(R.id.report_problem_highway_number);
         etlong=(EditText)findViewById(R.id.report_problem_logitude_edittext);
         etlat=(EditText)findViewById(R.id.report_problem_latitude_edittext);
@@ -83,7 +88,7 @@ public class ReportProblemActivity extends AppCompatActivity {
     }
     private void setbuttonfunctions()
     {
-        rbauto.setChecked(true);
+    /*    rbauto.setChecked(true);
         rbauto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,9 +110,10 @@ public class ReportProblemActivity extends AppCompatActivity {
                     iscordlayoutvisible=true;
                 }
             }
-        });
-        etlat.setText(lati);
-        etlong.setText(longi);
+        });*/
+
+  //      etlat.setText(lati);
+ //       etlong.setText(longi);
         tvemail.setText(email);
         tvpcat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +129,7 @@ public class ReportProblemActivity extends AppCompatActivity {
 
             }
         });
+/*
         btlastloc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,6 +138,7 @@ public class ReportProblemActivity extends AppCompatActivity {
                 showtoast("Last Saved Location is loaded in textbox");
             }
         });
+*/
         btimage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

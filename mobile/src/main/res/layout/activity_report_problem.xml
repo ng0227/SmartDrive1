@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/backimg1"
     android:orientation="vertical"
     tools:context="com.techhive.smartdrive.Problems.ReportProblemActivity">
 
@@ -22,8 +21,9 @@
             android:orientation="horizontal"
             android:weightSum="100"
             android:padding="15dp">
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="113dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="40"
                 android:padding="5dp"
