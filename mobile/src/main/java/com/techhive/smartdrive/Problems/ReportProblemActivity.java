@@ -36,6 +36,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
+import com.techhive.smartdrive.Utilities.Utils;
 
 import java.util.Date;
 
@@ -215,11 +216,11 @@ public class ReportProblemActivity extends AppCompatActivity {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle("Select Problem Category");
         String[] pictureDialogItems = {
-                "1",
-                "2",
-                "3",
-                "4",
-                "5"};
+                "1. Potholes",
+                "2. Accidents",
+                "3. Road terrain",
+                "4. Markings/Sign boards",
+                "5. Helpline"};
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener(){
                     @Override
@@ -300,6 +301,7 @@ public class ReportProblemActivity extends AppCompatActivity {
         public ProblemUpload(){}
         public ProblemUpload(Activity c, String email, String d1, String d2, String highway_Name, String problem_Level, String problem_Category, String description, Uri s)
         {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             storageReference = FirebaseStorage.getInstance().getReference();
             databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
             this.email=email;
@@ -319,17 +321,22 @@ public class ReportProblemActivity extends AppCompatActivity {
             MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
             return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
         }
-        public void UploadProblemImage()
-        {
+        public void UploadProblemImage() {
             progressDialog.setTitle("Image is Uploading...");
             progressDialog.show();
-            if(image_url==null)
+            if (image_url == null) {
+                UploadProblem("");
+                return;
+            }
+            Utils utils=new Utils(getApplicationContext());
+            if(!utils.isNetworkAvailable())
             {
                 UploadProblem("");
                 return;
             }
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(image_url));
-            storageReference2nd.putFile(image_url)
+            try{
+                StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(image_url));
+                storageReference2nd.putFile(image_url)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -340,8 +347,7 @@ public class ReportProblemActivity extends AppCompatActivity {
                     // If something goes wrong .
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception exception)
-                        {
+                        public void onFailure(@NonNull Exception exception) {
                             progressDialog.dismiss();
                             showtoast("There was some error in reporting. please try again.");
                         }
@@ -354,6 +360,7 @@ public class ReportProblemActivity extends AppCompatActivity {
                             progressDialog.setTitle("Image is Uploading...");
                         }
                     });
+        }catch (Exception e){UploadProblem("");}
         }
         public void UploadProblem(String imageurl1)
         {

@@ -24,13 +24,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,18 +50,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 import com.squareup.picasso.Picasso;
+import com.techhive.smartdrive.Accidents.SMSAlertActivity;
 import com.techhive.smartdrive.Problems.ReportProblemActivity;
+import com.techhive.smartdrive.Problems.TrackProblemActivity;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Speed.Accelerationlist;
 import com.techhive.smartdrive.Speed.Data;
 import com.techhive.smartdrive.Speed.GpsServices;
-import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Trackers.FileDownTryActivity;
+import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -109,10 +111,12 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
     ArrayList<LatLng> markerPoints = new ArrayList<>();
     static final int REQ_CODE = 123;
     Intent directionIntent;
+    private static final int REQUEST_SMS = 0;
+
 
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
-    private ArrayList<WeightedLatLng> data;
+    private ArrayList<WeightedLatLng> dataHeatMap;
 
 
     // boolean flag to toggle periodic location updates
@@ -525,10 +529,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         Starttoggle();
                         break;
                     case R.id.option2:
-                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
-                        irp.putExtra("longitude", longi);
-                        irp.putExtra("latitude", lati);
-                        startActivity(irp);
+
+//                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
+//                        irp.putExtra("longitude", longi);
+//                        irp.putExtra("latitude", lati);
+//                        startActivity(irp);
                         break;
                     case R.id.option3:
                         sharedPrefManager.saveLatitude(mContext, lati);
@@ -538,15 +543,27 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                     case R.id.option4:
                         directionIntent = new Intent(NavActivity.this, DirectionsActivity.class);
                         startActivityForResult(directionIntent, REQ_CODE);
-
                         Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
                         break;
+                    case R.id.option5:
+                      //  startActivity(new Intent(NavActivity.this, SMSAlertActivity.class));
 
+                        sendSMS();
+                        break;
 
                 }
             }
         });
 
+    }
+
+    private void sendSMS() {
+
+        String url="https://www.google.co.in/maps/@";
+        String message="Priyam has met an accident at "+url+lati+","+longi+"14z";
+        SmsManager.getDefault().sendTextMessage("9582291953", null, message, null, null);
+        SmsManager.getDefault().sendTextMessage("9718448388", null, message, null, null);
+        SmsManager.getDefault().sendTextMessage("8810463696", null, message, null, null);
     }
 
     public void initNavigationDrawer() {
@@ -586,8 +603,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         break;
                     case R.id.track_problem:
                         //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
-
                         Intent trackProblemIntent = new Intent(NavActivity.this, TrackProblemActivity.class);
+
                         startActivity(trackProblemIntent);
                         drawerLayout.closeDrawers();
                         break;
@@ -854,5 +871,22 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+
+
+    //Heat Map implementation
+    private void addHeatMap() {
+        List<LatLng> list = null;
+
+        //add data to this list. Each object of Data consisting LatLng object and level
+
+        // Create a heat map tile provider, passing it the latlngs of the police stations.
+        mProvider = new HeatmapTileProvider.Builder()
+                .weightedData(dataHeatMap)
+                .build();
+
+        // Add a tile overlay to the map, using the heat map tile provider.
+         mOverlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 }

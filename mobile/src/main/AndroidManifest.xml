@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+
 
     <application
         android:allowBackup="true"
@@ -40,7 +43,7 @@
 
         <activity
             android:name=".Activities.NavActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Activities.SplashScreenActivity" />
         <activity android:name=".Activities.FActivity">
             <intent-filter>
@@ -68,12 +71,12 @@
             android:name=".Problems.ReportProblemActivity"
             android:parentActivityName=".Activities.NavActivity" />
         <activity android:name=".Activities.DirectionsActivity" />
-        <activity android:name=".Activities.TrackProblemActivity" />
+        <activity android:name=".Problems.TrackProblemActivity" />
+        <activity android:name=".Activities.HeatMapActivity" />
         <activity android:name=".Activities.NearbyAuthoritiesActivity"></activity>
         <activity android:name=".Trackers.FileDownTryActivity" />
         <activity android:name=".Activities.ProfileActivity" />
-        <activity android:name=".Problems.TrackProblemActivity" />
-        <activity android:name=".Activities.HeatMapActivity"></activity>
+        <activity android:name=".Accidents.SMSAlertActivity" />
     </application>
 
 </manifest>

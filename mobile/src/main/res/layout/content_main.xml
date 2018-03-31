@@ -14,9 +14,10 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         />
     <RelativeLayout
+        android:id="@+id/servicelogo"
         android:layout_width="100dp"
         android:layout_height="150dp"
-        android:background="@drawable/marker"
+        android:background="@drawable/serviceon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="125dp">
         <TextView
@@ -24,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:text="trial"
+            android:text="--"
             android:textSize="35dp"
             android:layout_centerHorizontal="true"
             android:background="@color/White"/>

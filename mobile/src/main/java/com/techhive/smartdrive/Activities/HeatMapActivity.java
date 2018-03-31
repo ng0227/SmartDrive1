@@ -36,6 +36,6 @@ public class HeatMapActivity extends AppCompatActivity {
                 .build();
 
         // Add a tile overlay to the map, using the heat map tile provider.
-        mOverlay = googleMaps.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+       // mOverlay = googleMaps.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 }
