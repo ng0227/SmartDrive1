@@ -544,6 +544,10 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
 
     }
 
+    public void setnavlocation()
+    {
+        
+    }
     public void initNavigationDrawer() {
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
