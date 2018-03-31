@@ -50,8 +50,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
+import com.google.maps.android.heatmaps.WeightedLatLng;
 import com.squareup.picasso.Picasso;
 import com.techhive.smartdrive.Problems.ReportProblemActivity;
 import com.techhive.smartdrive.R;
@@ -106,6 +109,10 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
     ArrayList<LatLng> markerPoints = new ArrayList<>();
     static final int REQ_CODE = 123;
     Intent directionIntent;
+
+    private HeatmapTileProvider mProvider;
+    private TileOverlay mOverlay;
+    private ArrayList<WeightedLatLng> data;
 
 
     // boolean flag to toggle periodic location updates
@@ -562,7 +569,7 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         break;
                     case R.id.Near_Hospital:
                         Toast.makeText(mContext, "!333", Toast.LENGTH_LONG).show();
-                        Intent irp1=new Intent(NavActivity.this, FileDownTryActivity.class);
+                        Intent irp1 = new Intent(NavActivity.this, FileDownTryActivity.class);
                         startActivity(irp1);
                         drawerLayout.closeDrawers();
                         break;
@@ -578,9 +585,9 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.track_problem:
-                      //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
+                        //  Toast.makeText(mContext, "!555", Toast.LENGTH_LONG).show();
 
-                        Intent trackProblemIntent=new Intent(NavActivity.this,TrackProblemActivity.class);
+                        Intent trackProblemIntent = new Intent(NavActivity.this, TrackProblemActivity.class);
                         startActivity(trackProblemIntent);
                         drawerLayout.closeDrawers();
                         break;

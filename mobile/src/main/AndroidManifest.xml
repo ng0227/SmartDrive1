@@ -32,23 +32,23 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAc_pLhVLrFkjDEZXkLjy4p9xJwKSdhMLc" />
 
-<!--
+        <!--
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBHy-bVSFWltdOOGgD1usXNBXNXm6Y544s" />
--->
+        -->
 
         <activity
             android:name=".Activities.NavActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".Activities.SplashScreenActivity" />
+        <activity android:name=".Activities.FActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.SplashScreenActivity" />
-        <activity android:name=".Activities.FActivity" />
         <activity
             android:name=".Activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -67,18 +67,13 @@
         <activity
             android:name=".Problems.ReportProblemActivity"
             android:parentActivityName=".Activities.NavActivity" />
-
         <activity android:name=".Activities.DirectionsActivity" />
         <activity android:name=".Activities.TrackProblemActivity" />
-
-
-        <activity android:name=".Activities.NearbyAuthoritiesActivity">
-        </activity>
-
+        <activity android:name=".Activities.NearbyAuthoritiesActivity"></activity>
         <activity android:name=".Trackers.FileDownTryActivity" />
         <activity android:name=".Activities.ProfileActivity" />
-        <activity android:name=".Problems.TrackProblemActivity"></activity>
-
+        <activity android:name=".Problems.TrackProblemActivity" />
+        <activity android:name=".Activities.HeatMapActivity"></activity>
     </application>
 
 </manifest>

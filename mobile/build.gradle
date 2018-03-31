@@ -62,6 +62,7 @@ dependencies {
     compile 'com.google.maps:google-maps-services:0.1.20'
 
     compile 'com.google.maps.android:android-maps-utils:0.5+'
+
 }
 
 
