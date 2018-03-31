@@ -5,11 +5,14 @@ package com.techhive.smartdrive.Problems;
  */
 
 public class ProblemInfo {
-    String email,longitude,latitude,highway_Name,problem_Level,problem_Category,description,image_url;
+    String pid,email,longitude,latitude,highway_Name,problem_Level,problem_Category,description,image_url;
+    String date;
     int status;
     public ProblemInfo(){}
-    public ProblemInfo(String email,String d1,String d2,String tempImageName, String tempProblevel, String tempCategory, String tempDesc, String s)
+    public ProblemInfo(String date, String pid, String email, String d1, String d2, String tempImageName, String tempProblevel, String tempCategory, String tempDesc, String s)
     {
+        this.date=date;
+        this.pid=pid;
         longitude=d1;
         latitude=d2;
         problem_Level=tempProblevel;
@@ -20,6 +23,8 @@ public class ProblemInfo {
         this.email=email;
         status=0;
     }
+    public String getDate(){return date;}
+    public String getPid(){return pid;}
     public String getlongitude(){return longitude;}
     public String getlatitude(){return latitude;}
     public String getHighway_Name(){return highway_Name;}

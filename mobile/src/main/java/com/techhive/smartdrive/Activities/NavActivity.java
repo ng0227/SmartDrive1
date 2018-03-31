@@ -59,6 +59,7 @@ import com.techhive.smartdrive.Speed.Accelerationlist;
 import com.techhive.smartdrive.Speed.Data;
 import com.techhive.smartdrive.Speed.GpsServices;
 import com.techhive.smartdrive.Utilities.DirectionsJSONParser;
+import com.techhive.smartdrive.Trackers.FileDownTryActivity;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -561,6 +562,8 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         break;
                     case R.id.Near_Hospital:
                         Toast.makeText(mContext, "!333", Toast.LENGTH_LONG).show();
+                        Intent irp1=new Intent(NavActivity.this, FileDownTryActivity.class);
+                        startActivity(irp1);
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.highway_details:
