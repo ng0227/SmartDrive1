@@ -36,6 +36,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.techhive.smartdrive.R;
 import com.techhive.smartdrive.Utilities.SharedPrefManager;
+import com.techhive.smartdrive.Utilities.Utils;
 
 import java.util.Date;
 
@@ -281,7 +282,6 @@ public class ReportProblemActivity extends AppCompatActivity {
 
     public class ProblemUpload
     {
-
         String longitude,latitude,highway_Name,problem_Level,problem_Category,description,email;
         Uri image_url;
         public String Storage_Path = "Problem_Image_Uploads/";
@@ -313,17 +313,22 @@ public class ReportProblemActivity extends AppCompatActivity {
             MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
             return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
         }
-        public void UploadProblemImage()
-        {
+        public void UploadProblemImage() {
             progressDialog.setTitle("Image is Uploading...");
             progressDialog.show();
-            if(image_url==null)
+            if (image_url == null) {
+                UploadProblem("");
+                return;
+            }
+            Utils utils=new Utils(getApplicationContext());
+            if(!utils.isNetworkAvailable())
             {
                 UploadProblem("");
                 return;
             }
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(image_url));
-            storageReference2nd.putFile(image_url)
+            try{
+                StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(image_url));
+                storageReference2nd.putFile(image_url)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -334,8 +339,7 @@ public class ReportProblemActivity extends AppCompatActivity {
                     // If something goes wrong .
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception exception)
-                        {
+                        public void onFailure(@NonNull Exception exception) {
                             progressDialog.dismiss();
                             showtoast("There was some error in reporting. please try again.");
                         }
@@ -348,6 +352,7 @@ public class ReportProblemActivity extends AppCompatActivity {
                             progressDialog.setTitle("Image is Uploading...");
                         }
                     });
+        }catch (Exception e){UploadProblem("");}
         }
         public void UploadProblem(String imageurl1)
         {

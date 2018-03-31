@@ -51,6 +51,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+import com.techhive.smartdrive.Accidents.SMSAlertActivity;
 import com.techhive.smartdrive.Problems.ReportProblemActivity;
 import com.techhive.smartdrive.Problems.TrackProblemActivity;
 import com.techhive.smartdrive.R;
@@ -517,10 +518,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                         Starttoggle();
                         break;
                     case R.id.option2:
-                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
-                        irp.putExtra("longitude", longi);
-                        irp.putExtra("latitude", lati);
-                        startActivity(irp);
+
+//                        Intent irp = new Intent(NavActivity.this, ReportProblemActivity.class);
+//                        irp.putExtra("longitude", longi);
+//                        irp.putExtra("latitude", lati);
+//                        startActivity(irp);
                         break;
                     case R.id.option3:
                         sharedPrefManager.saveLatitude(mContext, lati);
@@ -530,10 +532,11 @@ public class NavActivity extends AppCompatActivity implements LocationListener, 
                     case R.id.option4:
                         directionIntent = new Intent(NavActivity.this, DirectionsActivity.class);
                         startActivityForResult(directionIntent, REQ_CODE);
-
                         Toast.makeText(NavActivity.this, "4", Toast.LENGTH_LONG).show();
                         break;
-
+                    case R.id.option5:
+                        startActivity(new Intent(NavActivity.this, SMSAlertActivity.class));
+                        break;
 
                 }
             }

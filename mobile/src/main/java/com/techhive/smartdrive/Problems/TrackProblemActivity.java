@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,14 +23,15 @@ public class TrackProblemActivity extends AppCompatActivity {
     DatabaseReference databaseReference,databaseReference1;
     ArrayList<ProblemReportInfo> clientProblems = new ArrayList<>();
     ArrayList<ProblemReportInfo> processProblems=new ArrayList<>();
+    ArrayList<ProblemReportInfo> FinalProblemList=new ArrayList<>();
     private TrackProblemAdapter problemAdapter;
     private RecyclerView recyclerView;
-
+    FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_problem);
-
+        mAuth=FirebaseAuth.getInstance();
         recyclerView=findViewById(R.id.recycler_view);
         setUpAdapter();
 
@@ -39,14 +41,13 @@ public class TrackProblemActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 clientProblems.clear();
-
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ProblemReportInfo imageUploadInfo = postSnapshot.getValue(ProblemReportInfo.class);
-                    clientProblems.add(imageUploadInfo);
+                    if(imageUploadInfo.getEmail().equals(mAuth.getCurrentUser().getEmail()))
+                    {clientProblems.add(imageUploadInfo);}
                 }
                 Collections.reverse(clientProblems);
-                clientProblems.addAll(processProblems);
-                problemAdapter.setProblems(clientProblems);
+                joinbothlists();
             }
 
             @Override
@@ -60,14 +61,14 @@ public class TrackProblemActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 processProblems.clear();
-
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ProblemReportInfo imageUploadInfo = postSnapshot.getValue(ProblemReportInfo.class);
-                    processProblems.add(imageUploadInfo);
+                    if(imageUploadInfo.getEmail().equals(mAuth.getCurrentUser().getEmail()))
+                    {processProblems.add(imageUploadInfo);}
+
                 }
                 Collections.reverse(processProblems);
-                processProblems.addAll(clientProblems);
-                problemAdapter.setProblems(processProblems);
+                joinbothlists();
             }
 
             @Override
@@ -77,6 +78,14 @@ public class TrackProblemActivity extends AppCompatActivity {
         });
     }
 
+    private void joinbothlists()
+    {
+        FinalProblemList.clear();
+        FinalProblemList.addAll(processProblems);
+        FinalProblemList.addAll(clientProblems);
+        problemAdapter.setProblems(FinalProblemList);
+        problemAdapter.notifyDataSetChanged();
+    }
     private void setUpAdapter() {
         problemAdapter = new TrackProblemAdapter(this, new ArrayList<ProblemReportInfo>());
         recyclerView.setHasFixedSize(true);
